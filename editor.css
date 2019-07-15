@@ -1,0 +1,176 @@
+*,*::before,*::after{
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+input:focus, textarea:focus {
+    outline: 2px solid #5A5046;
+    border: 2px solid #5A5046;
+}
+
+[contenteditable]:focus {
+    outline: 2px solid #5A5046;
+    /* border: 2px solid #5A5046; */
+}
+
+@font-face {
+    font-family: 'PRNumber3';
+    src: url('fonts/PRNumber3.ttf') format('truetype');
+    font-weight: medium;
+    font-style: medium;
+}
+
+html{
+    font-size: 1.0rem;
+    /* font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; */
+    font-family: 'PRNumber3';
+}
+
+body {
+    background-color: #CABEA8;
+}
+
+.toolbar{
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(20px,40px));
+    background-color: rgb(231, 231, 231);
+    color: rgb(0, 0, 0);
+    grid-gap: 1rem;
+    padding: 1rem;
+    justify-content: center;
+    align-items:center;
+}
+
+.tool-items{
+    background-color: rgb(27, 26, 26);
+     padding-top: .6rem;
+     padding-bottom:.6rem;
+    cursor: pointer;
+    color: #ffff;
+}
+.tool-items:hover{
+    box-shadow: none;
+    background-color: #6b5e5e;
+
+}
+
+.title{
+     display: flex;
+     justify-content: center;
+     flex-wrap: wrap;
+     margin-top: 40px;
+}
+
+.title div {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 3px;
+}
+
+.center{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+
+.editor{
+    font-family: 'PRNumber3', Arial, sans-serif;
+    color: #4FA550;
+    background-color: black;
+    white-space: pre;
+    width:70vw;
+    height: 50vh;
+    margin: 2rem;
+    padding: 1rem;
+    font-size: 1.0rem;
+    box-shadow: 0 .1rem .4rem black;
+    border: 1px solid black;
+    overflow-y: auto;
+}
+
+.editor div {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.getcontent{
+    height: 200px;
+    width: 80vw;
+    background-color: rgb(255, 255, 255);
+    overflow: auto;
+    padding: 1rem;
+    display: block;
+    margin-top: 1rem;
+    box-shadow: .1rem .1rem .5rem rgb(255, 255, 255);
+    border: 1px solid rgb(0, 0, 0);
+}
+
+.csscontent{
+    height: 200px;
+    width: 80vw;
+    background-color: rgb(255, 255, 255);
+    overflow: auto;
+    padding: 1rem;
+    display: block;
+    margin-top: 1rem;
+    box-shadow: .1rem .1rem .5rem rgb(255, 255, 255);
+    border: 1px solid rgb(0, 0, 0);
+}
+
+.btn {
+    font-family: 'PRNumber3';
+    padding: .5rem;
+    background-color: #000000;
+    margin-right: 1rem;
+    color: #4FA550;
+    letter-spacing: .1rem;
+    font-size: 1rem;
+    border-radius: .2rem;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 .4rem .4rem black;
+    transition: all .3s;
+}
+
+.btn:hover{
+      background-color: #333333;
+      box-shadow: 0 .1rem .1rem black;
+}
+
+
+
+img{
+    width: 60px;
+    height: 60px;
+    margin-top: .4rem;
+    border-radius: 50rem;
+}
+label {
+    margin-left: 0.04rem;
+    padding-left:.7rem
+}
+
+.asmLabel { 
+    color: #4FA550;
+    float: left;
+    width: 100px;
+}
+
+.asmOpcode { 
+    color: #4FA550;
+    float: left;
+    width: 50px;
+}
+
+.asmArg { 
+    color: #4FA550;
+    float: left;
+    width: 200px;
+}
+
+.asmComment { 
+    color: #4FA550;
+}

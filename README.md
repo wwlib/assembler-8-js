@@ -2,7 +2,9 @@
 
 Inspired by the Merlin 8 Assembler for the Apple II
 
-This is an **incomplete** proof of concept demonstrating the use of Javascript and the browser's [contenteditable](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content) attibute.
+This is an **incomplete** proof of concept demonstrating the use of Javascript and the browser's [contenteditable](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content) attibute to implement a simple assembly editor.
+
+This POC is a simple editor.
 
 #### Merlin
 - Merlin source code text can be pasted into the Assembler 8 editor
@@ -17,6 +19,7 @@ This is an **incomplete** proof of concept demonstrating the use of Javascript a
 - add space-triggered tabbing
 - add better horizontal and vertical keyboard navigation
 - ...
+- integrate a Javascript assembler
 
 #### Controls
 - GetHTML: displays the editor html in the I/O text area

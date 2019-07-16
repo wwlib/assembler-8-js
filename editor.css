@@ -96,6 +96,7 @@ body {
 }
 
 .getcontent{
+    font-family: monospace;
     height: 200px;
     width: 80vw;
     background-color: rgb(255, 255, 255);

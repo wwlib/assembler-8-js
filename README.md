@@ -1,6 +1,6 @@
 ### Assembler 8 JS (Proof of Concept)
 
-Inspired by the Merlin 8 Assembler for the Apple II
+A Javascript 6502 assembly text editor inspired by the Merlin 8 Assembler for the Apple II
 
 This is an **incomplete** proof of concept demonstrating the use of Javascript and the browser's [contenteditable](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content) attibute to implement a simple in-browser assembly editor.
 
@@ -26,7 +26,7 @@ This POC is a simple editor.
 - The edited code can be exported to Merlin-fiendly, space-delimited text
 
 #### Status
-- Currenty, just a proof of concept of a simple in-browser assembly editor
+- Currenty, a proof of concept of a simple in-browser assembly text editor
 
 #### Todo
 - convert to Typescript

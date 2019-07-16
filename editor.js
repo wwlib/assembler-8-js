@@ -13,11 +13,12 @@ const spanClassNameMap = {
     asmOpcode: 1,
     asmArg: 2,
     asmComment: 3,
+    asmAsterisk: 4,
 }
 
 const spanClassNames = Object.keys(spanClassNameMap);
 
-content.innerText = `<span class="asmLabel">LOOP</span><span class="asmOpcode">LDA</span><span class="asmArg">#$00</span><span class="asmComment">;COMMENT</span>`;
+content.innerText = ``;
 editorContent.innerHTML = '';
 
 const editorCss = `.asmLabel { 
@@ -78,7 +79,8 @@ editorContent.onkeydown = function (evt) {
         }
     } else if (evt.keyCode == 13) {
         evt.preventDefault();
-        const parentDiv = getParentDiv(getEditedSpan());
+        const editedSpan = getEditedSpan();
+        const parentDiv = getParentDiv(editedSpan);
         if (parentDiv) {
             const container = parentDiv.parentNode;
             const previousDiv = parentDiv.previousSibling;
@@ -90,7 +92,11 @@ editorContent.onkeydown = function (evt) {
             } else {
                 const newDiv = document.createElement('div');
                 newDiv.innerHTML = `<span class="asmLabel"> </span><span class="asmOpcode"> </span><span class="asmArg"> </span><span class="asmComment"> </span>`;
-                container.insertBefore(newDiv, nextDiv);
+                if (getSpanClassIndex(editedSpan) == 0) {
+                    container.insertBefore(newDiv, parentDiv);
+                } else {
+                    container.insertBefore(newDiv, nextDiv);
+                }
                 firstSpan = getFirstSpan(newDiv);
             }
             if (firstSpan) {
@@ -166,31 +172,36 @@ rewriteContent = function () {
         // console.log(`lines:`, JSON.stringify(lines, null, 2));
         let linesHtml = '';
         lines.forEach(line => {
-            const parts = line.split(' ');
-            // console.log(`parts: count:`, parts.length);
-            // console.log(`parts:`, JSON.stringify(parts, null, 2));
+            const firstCharacter = line.substring(0, 1);
             let lineHtml = '';
-            let comment = '';
-            const numParts = parts.length;
-            for (let i = 0; i < numParts; i++) {
-                const part = parts[i] || ' ';
-                switch (i) {
-                    case 0:
-                    case 1:
-                    case 2:
-                        lineHtml += `<span class="${spanClassNames[i]}">${part}</span>`;
-                        break;
-                    default:
-                        comment += part;
-                        if (i < numParts - 1) {
-                            comment += ' ';
-                        }
-                        break;
+            if (firstCharacter == '*') {
+                lineHtml += `<span class="${spanClassNames[4]}">${line}</span>`;
+            } else {
+                const parts = line.split(' ');
+                let comment = '';
+                const numParts = parts.length;
+                for (let i = 0; i < numParts; i++) {
+                    const part = parts[i] || ' ';
+                    switch (i) {
+                        case 0:
+                        case 1:
+                        case 2:
+                            lineHtml += `<span class="${spanClassNames[i]}">${part}</span>`;
+                            break;
+                        default:
+                            comment += part;
+                            if (i < numParts - 1) {
+                                comment += ' ';
+                            }
+                            break;
+                    }
                 }
+                comment = comment || ' '
+                lineHtml += `<span class="${spanClassNames[3]}">${comment}</span>`;
             }
-            comment = comment || ' '
-            lineHtml += `<span class="${spanClassNames[3]}">${comment}</span>`;
-            linesHtml += `<div>${lineHtml}</div>`;
+            if (lineHtml) {
+                linesHtml += `<div>${lineHtml}</div>`;
+            }
         });
         editorContent.innerHTML = linesHtml;
         // Set selection: end of first span
@@ -270,56 +281,65 @@ getLineHtmlWithLineTextArray = function (lineTextArray, editedSpanClassName, sel
     const editedSpanIndex = spanClassNameMap[editedSpanClassName];
     // console.log(`getLineHtmlWithLineTextArray: editedSpanClassName:`, editedSpanClassName, editedSpanIndex);
     // add default spans
-    for (let s = 0; s < 4; s++) {
-        spans.push(`<span class="${spanClassNames[s]}"> </span>`);
-    }
-    const lineText = lineTextArray.join(' ');
-    const parts = lineText.split(' ');
     let lineHtml = '';
-    let comment = '';
-    const numParts = parts.length;
-    // LABEL
-    let part = parts[0];
     let spaceTab = false; // was space typed at the end of a term
-    if (part) {
-        part = part.replace(/~+/g, '') || ' ';
-        if (editedSpanIndex == 0 && selectionOffset > part.length) {
-            selectionOffset = part.length;
-            spaceTab = true;
+    if (editedSpanClassName == 'asmAsterisk') {
+        if (lineTextArray && lineTextArray.length > 0) {
+            let line = lineTextArray.join(' ');
+            line = line.replace(/~/g, ' ');
+            lineHtml += `<span class="${spanClassNames[4]}">${line}</span>`;
         }
-        spans[0] = `<span class="${spanClassNames[0]}">${part}</span>`;
-    }
-    // OPCODE
-    part = parts[1];
-    if (part) {
-        part = part.replace(/~+/g, '') || ' ';
-        if (editedSpanIndex == 1 && selectionOffset > part.length) {
-            selectionOffset = part.length;
-            spaceTab = true;
+    } else {
+        for (let s = 0; s < 4; s++) {
+            spans.push(`<span class="${spanClassNames[s]}"> </span>`);
         }
-        spans[1] = `<span class="${spanClassNames[1]}">${part}</span>`;
-    }
-    // ARG
-    part = parts[2];
-    if (part) {
-        part = part.replace(/~+/g, '') || ' ';
-        if (editedSpanIndex == 2 && selectionOffset > part.length) {
-            selectionOffset = part.length;
-            spaceTab = true;
+        const lineText = lineTextArray.join(' ');
+        const parts = lineText.split(' ');
+
+        let comment = '';
+        const numParts = parts.length;
+        // LABEL
+        let part = parts[0];
+        if (part) {
+            part = part.replace(/~+/g, '') || ' ';
+            if (editedSpanIndex == 0 && selectionOffset > part.length) {
+                selectionOffset = part.length;
+                spaceTab = true;
+            }
+            spans[0] = `<span class="${spanClassNames[0]}">${part}</span>`;
         }
-        spans[2] = `<span class="${spanClassNames[2]}">${part}</span>`;
-    }
-    // COMMENTS
-    if (numParts > 3) {
-        comment = parts[3];
-        comment = comment.replace(/~/g, ' ');
-        if (editedSpanIndex == 3 && selectionOffset > comment.length) {
-            selectionOffset = comment.length
+        // OPCODE
+        part = parts[1];
+        if (part) {
+            part = part.replace(/~+/g, '') || ' ';
+            if (editedSpanIndex == 1 && selectionOffset > part.length) {
+                selectionOffset = part.length;
+                spaceTab = true;
+            }
+            spans[1] = `<span class="${spanClassNames[1]}">${part}</span>`;
         }
-        // const commentLastCharacter = comment.substring(comment.length - 1);
-        spans[3] = `<span class="${spanClassNames[3]}">${comment}</span>`;
+        // ARG
+        part = parts[2];
+        if (part) {
+            part = part.replace(/~+/g, '') || ' ';
+            if (editedSpanIndex == 2 && selectionOffset > part.length) {
+                selectionOffset = part.length;
+                spaceTab = true;
+            }
+            spans[2] = `<span class="${spanClassNames[2]}">${part}</span>`;
+        }
+        // COMMENTS
+        if (numParts > 3) {
+            comment = parts[3];
+            comment = comment.replace(/~/g, ' ');
+            if (editedSpanIndex == 3 && selectionOffset > comment.length) {
+                selectionOffset = comment.length
+            }
+            // const commentLastCharacter = comment.substring(comment.length - 1);
+            spans[3] = `<span class="${spanClassNames[3]}">${comment}</span>`;
+        }
+        lineHtml += spans.join('');
     }
-    lineHtml += spans.join('');
     return { lineHtml: lineHtml, selectionOffset: selectionOffset, spaceTab: spaceTab };
 }
 
@@ -576,7 +596,10 @@ resetEditor = function () {
     // START JSR BELL ;RING THE BELL
     // END RTS
     // `;
-    editorContent.innerHTML = ` ORG $0800
+    editorContent.innerHTML = `*****************************************
+*           PATTERN KEYS                *
+*****************************************
+ ORG $0800
 PATT EQU $FC
 GRAPH EQU $C050
 TEXT EQU $C051

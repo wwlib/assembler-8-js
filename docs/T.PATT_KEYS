@@ -1,6 +1,6 @@
-*****************************************
-*           PATTERN KEYS                *
-*****************************************
+******************************
+* PATTERN KEYS    *
+******************************
  ORG $0800 
 PATT EQU $FC 
 GRAPH EQU $C050 ; DEFINE SOFT SWITCHES
@@ -56,4 +56,4 @@ BUMPMSB INC MSB
  CMP MSB 
  BEQ RETURN 
  JMP LOOP 
-RETURN RTS
+RETURN RTS 

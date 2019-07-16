@@ -1,0 +1,7 @@
+******************
+* SAMPLE PROGRAM *
+******************
+ ORG $300 
+BELL EQU $FBDD 
+START JSR BELL ;RING THE BELL
+END RTS

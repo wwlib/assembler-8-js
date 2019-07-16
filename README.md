@@ -61,18 +61,20 @@ This is an **incomplete** proof of concept demonstrating the use of Javascript a
 #### examples
 - ring the BELL
 ```
- ORG $300
- EQU $F8DD
+******************************
+* RING THE BELL   *
+******************************
+ ORG $300 
+BELL EQU $FBDD 
 START JSR BELL ;RING THE BELL
 END RTS
-
 ```
 
 - hires byte patterns from keyboard input
 ```
-*****************************************
-*           PATTERN KEYS                *
-*****************************************
+******************************
+* PATTERN KEYS    *
+******************************
  ORG $0800 
 PATT EQU $FC 
 GRAPH EQU $C050 ; DEFINE SOFT SWITCHES
@@ -129,7 +131,6 @@ BUMPMSB INC MSB
  BEQ RETURN 
  JMP LOOP 
 RETURN RTS
-
 ```
 
 #### PATTERN KEYS

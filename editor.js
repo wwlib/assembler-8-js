@@ -154,6 +154,12 @@ editorContent.onkeyup = function (evt) {
     }
 }
 
+editorContent.addEventListener("paste", function (evt) {
+    evt.preventDefault();
+    var text = (evt.originalEvent || evt).clipboardData.getData('text/plain');
+    document.execCommand("insertHTML", false, text);
+});
+
 rewriteContent = function () {
     let result = { spaceTab: false }
     const divs = editorContent.getElementsByTagName('div');
@@ -169,7 +175,7 @@ rewriteContent = function () {
         // console.log(`textContent:`, textContent);
         // console.log(`innerHTML:`, innerHTML);
         // console.log(`lines: count:`, lines.length);
-        // console.log(`lines:`, JSON.stringify(lines, null, 2));
+        console.log(`lines:`, JSON.stringify(lines, null, 2));
         let linesHtml = '';
         lines.forEach(line => {
             const firstCharacter = line.substring(0, 1);
@@ -596,9 +602,9 @@ resetEditor = function () {
     // START JSR BELL ;RING THE BELL
     // END RTS
     // `;
-    editorContent.innerHTML = `*****************************************
-*           PATTERN KEYS                *
-*****************************************
+    editorContent.innerHTML = `******************************
+* PATTERN KEYS    *
+******************************
  ORG $0800 
 PATT EQU $FC 
 GRAPH EQU $C050 ; DEFINE SOFT SWITCHES

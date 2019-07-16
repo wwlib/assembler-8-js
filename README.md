@@ -2,9 +2,22 @@
 
 Inspired by the Merlin 8 Assembler for the Apple II
 
-This is an **incomplete** proof of concept demonstrating the use of Javascript and the browser's [contenteditable](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content) attibute to implement a simple assembly editor.
+This is an **incomplete** proof of concept demonstrating the use of Javascript and the browser's [contenteditable](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content) attibute to implement a simple in-browser assembly editor.
 
 This POC is a simple editor.
+
+#### Motivation
+- Developing Apple II (6502) assembly code would be easier with a column-oriented editor
+- There does not seem to be a good browser-based, cross-platform, open source column-oriented editor appropriate for writing Apple II (6502) assembly.
+- Editors like Ace and Monaco don't seem to support column-oriented modes.
+- Assembly
+- In assembly code, spaces should indicate 'tabstop' breaks
+- Online conversations about tabstops, elastic tabstops, etc confirm the need and also show the lack of available solutions that are appropriate for assembly:
+  - http://nickgravgaard.com/elastic-tabstops/
+  - http://tibleiz.net/code-browser/elastic-tabstops.html
+  - http://tomaslind.net/2016/02/18/how-to-align-columns-in-notepad/
+  - https://www.ultraedit.com/support/tutorials-power-tips/ultraedit/csv-files.html
+
 
 #### Merlin
 - Merlin source code text can be pasted into the Assembler 8 editor
@@ -13,13 +26,26 @@ This POC is a simple editor.
 - The edited code can be exported to Merlin-fiendly, space-delimited text
 
 #### Status
-- This proof of concept is incomplete and buggy
+- Currenty, just a proof of concept of a simple in-browser assembly editor
 
 #### Todo
-- add space-triggered tabbing
-- add better horizontal and vertical keyboard navigation
+- convert to Typescript
+- add better vertical keyboard navigation
 - ...
 - integrate a Javascript assembler
+
+#### Reference
+- How to build your own WYSIWYG Editor
+  - https://codeburst.io/how-to-build-your-own-wysiwyg-editor-6002fa3f5ea8
+- contentEditable
+  - https://ckeditor.com/blog/ContentEditable-The-Good-the-Bad-and-the-Ugly/
+  - https://javascript.info/mutation-observer
+  - https://medium.engineering/why-contenteditable-is-terrible-122d8a40e480
+  - https://medium.com/@adrianmcli/a-beginner-s-guide-to-draft-js-d1823f58d8cc
+  - https://www.mozzafiller.com/posts/how-does-monaco-editor-enable-text-editing-on-a-web-page
+- Keyboard events
+  - https://javascript.info/keyboard-events
+
 
 #### Controls
 - GetHTML: displays the editor html in the I/O text area

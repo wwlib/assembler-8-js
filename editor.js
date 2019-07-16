@@ -43,8 +43,7 @@ const editorCss = `.asmLabel {
 }
 
 .editor div {
-    padding-top: 2px;
-    padding-bottom: 2px;
+    margin-bottom: 2px;
 }
 `
 
@@ -67,11 +66,47 @@ cssContent.value = editorCss;
 
 editorContent.onkeydown = function (evt) {
     evt = evt || window.event;
-    console.log("keydown: ", evt.keyCode, evt.key, evt);
+    // console.log("keydown: ", evt.keyCode, evt.key, evt);
     if (evt.keyCode == 9) {
         evt.preventDefault();
-        const editedSpan = getEditedSpan();
-        console.log(`editedSpan:`, editedSpan);
+        // const editedSpan = getEditedSpan();
+        // console.log(`editedSpan:`, editedSpan);
+        if (evt.shiftKey) {
+            selectPreviousSpan();
+        } else {
+            selectNextSpan();
+        }
+    } else if (evt.keyCode == 13) {
+        evt.preventDefault();
+        const parentDiv = getParentDiv(getEditedSpan());
+        if (parentDiv) {
+            const container = parentDiv.parentNode;
+            const previousDiv = parentDiv.previousSibling;
+            const nextDiv = parentDiv.nextSibling;
+            let firstSpan = undefined;
+            if (evt.shiftKey) {
+                container.removeChild(parentDiv);
+                firstSpan = getFirstSpan(previousDiv);
+            } else {
+                const newDiv = document.createElement('div');
+                newDiv.innerHTML = `<span class="asmLabel"> </span><span class="asmOpcode"> </span><span class="asmArg"> </span><span class="asmComment"> </span>`;
+                container.insertBefore(newDiv, nextDiv);
+                firstSpan = getFirstSpan(newDiv);
+            }
+            if (firstSpan) {
+                const spanText = getSpanText(firstSpan);
+                const sel = document.getSelection();
+                const textNode = firstSpan.childNodes[0];
+                if (textNode) {
+                    const anchorOffset = spanText.length;
+                    const range = document.createRange();
+                    sel.removeAllRanges();
+                    range.setStart(textNode, anchorOffset);
+                    range.setEnd(textNode, anchorOffset);
+                    sel.addRange(range);
+                }
+            }
+        }
     }
 };
 
@@ -84,20 +119,45 @@ editorContent.onkeyup = function (evt) {
         case 16:
         case 9:
             break;
+        case 13:
+            evt.preventDefault();
+            // const parentDiv = getParentDiv(getEditedSpan());
+            // if (!isValidDiv(parentDiv)) {
+            //     const reformatDivData = reformatDiv(parentDiv, 'asmLabel', 0);
+            // }
+            // const firstSpan = getFirstSpan(parentDiv);
+            // const spanText = getSpanText(firstSpan);
+            // const sel = document.getSelection();
+            // const textNode = firstSpan.childNodes[0];
+            // if (textNode) {
+            //     const anchorOffset = spanText.length;
+            //     const range = document.createRange();
+            //     sel.removeAllRanges();
+            //     range.setStart(textNode, anchorOffset);
+            //     range.setEnd(textNode, anchorOffset);
+            //     sel.addRange(range);
+            // }
+            break;
         default:
-            rewriteContent();
+            const rewriteData = rewriteContent();
+            // console.log(`keyup: rewriteData:`, rewriteData);
+            if (rewriteData.spaceTab) {
+                selectNextSpan();
+            }
             break
     }
 }
 
 rewriteContent = function () {
+    let result = { spaceTab: false }
     const divs = editorContent.getElementsByTagName('div');
-    console.log(`elements:`, divs);
+    // console.log(`elements:`, divs);
 
+    // Starting from "clear". No divs.
     if (divs.length == 0) {
         const innerText = editorContent.innerText;
-        const textContent = editorContent.textContent;
-        const innerHTML = editorContent.innerHTML;
+        // const textContent = editorContent.textContent;
+        // const innerHTML = editorContent.innerHTML;
         const lines = innerText.split('\n');
         // console.log(`innerText:`, innerText);
         // console.log(`textContent:`, textContent);
@@ -133,36 +193,52 @@ rewriteContent = function () {
             linesHtml += `<div>${lineHtml}</div>`;
         });
         editorContent.innerHTML = linesHtml;
-    } else {
+        // Set selection: end of first span
         const sel = document.getSelection();
-        console.log(sel);
-        const anchorNode = sel.anchorNode;
-        let anchorOffset = sel.anchorOffset;
-        console.log(`anchorNode:`, anchorNode);
-        console.log(`anchorOffset:`, anchorNode);
-        let closestSpan = getClosestSpan(anchorNode);
-        const editedSpanClassName = closestSpan.className;
-        console.log(`closestSpan:`, closestSpan, editedSpanClassName);
-        const parentDiv = getParentDiv(anchorNode)
-        const reformatDivData = reformatDiv(parentDiv, editedSpanClassName, anchorOffset);
-        console.log(`reformatDivData:`, reformatDivData);
-        if (reformatDivData && reformatDivData.selectionOffset) {
-            anchorOffset = reformatDivData.selectionOffset
-        }
-        closestSpan = parentDiv.getElementsByClassName(editedSpanClassName)[0];
-        console.log(closestSpan);
-        if (closestSpan) {
-            // closestSpan.selectionStart = anchorOffset;
-            const textNode = closestSpan.childNodes[0];
-            console.log(textNode);
+        const firstDiv = getFirstDiv();
+        const firstSpan = getFirstSpan(firstDiv);
+        const spanText = getSpanText(firstSpan);
+        const textNode = firstSpan.childNodes[0];
+        if (textNode) {
+            const anchorOffset = spanText.length;
             const range = document.createRange();
+            sel.removeAllRanges();
             range.setStart(textNode, anchorOffset);
             range.setEnd(textNode, anchorOffset);
-            console.log(range);
-            sel.removeAllRanges();
             sel.addRange(range);
         }
+    } else {
+        const sel = document.getSelection();
+        // console.log(sel);
+        const anchorNode = sel.anchorNode;
+        let anchorOffset = sel.anchorOffset;
+        // console.log(`anchorNode:`, anchorNode);
+        // console.log(`anchorOffset:`, anchorNode);
+        let closestSpan = getClosestSpan(anchorNode);
+        if (closestSpan) {
+            const editedSpanClassName = closestSpan.className;
+            // console.log(`closestSpan:`, closestSpan, editedSpanClassName);
+            const parentDiv = getParentDiv(anchorNode)
+            const reformatDivData = reformatDiv(parentDiv, editedSpanClassName, anchorOffset);
+            // console.log(`reformatDivData:`, reformatDivData);
+            result.spaceTab = reformatDivData.spaceTab;
+            if (reformatDivData && reformatDivData.selectionOffset) {
+                anchorOffset = reformatDivData.selectionOffset
+            }
+            closestSpan = parentDiv.getElementsByClassName(editedSpanClassName)[0];
+            // console.log(closestSpan);
+            if (closestSpan) {
+                // closestSpan.selectionStart = anchorOffset;
+                const textNode = closestSpan.childNodes[0];
+                const range = document.createRange();
+                range.setStart(textNode, anchorOffset);
+                range.setEnd(textNode, anchorOffset);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        }
     }
+    return result;
 }
 
 getMerlinText = function () {
@@ -178,7 +254,7 @@ getMerlinText = function () {
                 const lineTextArray = [];
                 for (let j = 0; j < numSpans; j++) {
                     const span = spans[j];
-                    let spanText = span.textContent.trim();
+                    let spanText = getSpanText(span);
                     // spanText = spanText.replace(/\s/g, '~');
                     lineTextArray.push(spanText);
                 }
@@ -192,7 +268,7 @@ getMerlinText = function () {
 getLineHtmlWithLineTextArray = function (lineTextArray, editedSpanClassName, selectionOffset) {
     const spans = [];
     const editedSpanIndex = spanClassNameMap[editedSpanClassName];
-    console.log(`getLineHtmlWithLineTextArray: editedSpanClassName:`, editedSpanClassName, editedSpanIndex);
+    // console.log(`getLineHtmlWithLineTextArray: editedSpanClassName:`, editedSpanClassName, editedSpanIndex);
     // add default spans
     for (let s = 0; s < 4; s++) {
         spans.push(`<span class="${spanClassNames[s]}"> </span>`);
@@ -204,10 +280,12 @@ getLineHtmlWithLineTextArray = function (lineTextArray, editedSpanClassName, sel
     const numParts = parts.length;
     // LABEL
     let part = parts[0];
+    let spaceTab = false; // was space typed at the end of a term
     if (part) {
         part = part.replace(/~+/g, '') || ' ';
         if (editedSpanIndex == 0 && selectionOffset > part.length) {
-            selectionOffset = part.length
+            selectionOffset = part.length;
+            spaceTab = true;
         }
         spans[0] = `<span class="${spanClassNames[0]}">${part}</span>`;
     }
@@ -216,7 +294,8 @@ getLineHtmlWithLineTextArray = function (lineTextArray, editedSpanClassName, sel
     if (part) {
         part = part.replace(/~+/g, '') || ' ';
         if (editedSpanIndex == 1 && selectionOffset > part.length) {
-            selectionOffset = part.length
+            selectionOffset = part.length;
+            spaceTab = true;
         }
         spans[1] = `<span class="${spanClassNames[1]}">${part}</span>`;
     }
@@ -225,7 +304,8 @@ getLineHtmlWithLineTextArray = function (lineTextArray, editedSpanClassName, sel
     if (part) {
         part = part.replace(/~+/g, '') || ' ';
         if (editedSpanIndex == 2 && selectionOffset > part.length) {
-            selectionOffset = part.length
+            selectionOffset = part.length;
+            spaceTab = true;
         }
         spans[2] = `<span class="${spanClassNames[2]}">${part}</span>`;
     }
@@ -236,18 +316,18 @@ getLineHtmlWithLineTextArray = function (lineTextArray, editedSpanClassName, sel
         if (editedSpanIndex == 3 && selectionOffset > comment.length) {
             selectionOffset = comment.length
         }
-        const commentLastCharacter = comment.substring(comment.length - 1);
+        // const commentLastCharacter = comment.substring(comment.length - 1);
         spans[3] = `<span class="${spanClassNames[3]}">${comment}</span>`;
     }
     lineHtml += spans.join('');
-    return { lineHtml: lineHtml, selectionOffset: selectionOffset };
+    return { lineHtml: lineHtml, selectionOffset: selectionOffset, spaceTab: spaceTab };
 }
 
 reformatDiv = function (div, editedSpanClassName, anchorOffset) {
-    console.log(`reformatDiv:`, div, anchorOffset);
-    console.log(`[${div.textContent}]`);
+    // console.log(`reformatDiv:`, div, anchorOffset);
+    // console.log(`[${div.textContent}]`);
     const spans = div.getElementsByTagName('span');
-    console.log(spans);
+    // console.log(spans);
     const numSpans = spans.length;
     let lineTextArray = [];
     for (let i = 0; i < numSpans; i++) {
@@ -256,11 +336,122 @@ reformatDiv = function (div, editedSpanClassName, anchorOffset) {
         spanText = spanText.replace(/\s/g, '~');
         lineTextArray.push(spanText);
     }
-    console.log(`lineTextArray: [${lineTextArray}]`);
+    // console.log(`lineTextArray: [${lineTextArray}]`);
     const lineHtmlData = getLineHtmlWithLineTextArray(lineTextArray, editedSpanClassName, anchorOffset);
-    console.log(`reformatDiv: lineHtml:`, lineHtmlData.lineHtml);
+    // console.log(`reformatDiv: lineHtml:`, lineHtmlData.lineHtml);
     div.innerHTML = lineHtmlData.lineHtml;
-    return { selectionOffset: lineHtmlData.selectionOffset }
+    return { selectionOffset: lineHtmlData.selectionOffset, spaceTab: lineHtmlData.spaceTab }
+}
+
+selectNextSpan = function () {
+    const editedSpan = getEditedSpan();
+    if (editedSpan) {
+        const nextSpan = getNextSpan(editedSpan);
+        if (nextSpan) {
+            const sel = document.getSelection();
+            sel.removeAllRanges();
+            // console.log(`sel.anchorOffset:`, sel.anchorOffset);
+            const spanText = getSpanText(nextSpan);
+            // console.log(`selectNextSpan:`, nextSpan, spanText);
+            const textNode = nextSpan.childNodes[0];
+            if (textNode) {
+                const anchorOffset = spanText.length;
+                const range = document.createRange();
+                range.setStart(textNode, anchorOffset);
+                range.setEnd(textNode, anchorOffset);
+                sel.addRange(range);
+            }
+        }
+    }
+}
+
+selectPreviousSpan = function () {
+    const editedSpan = getEditedSpan();
+    if (editedSpan) {
+        const nextSpan = getPreviousSpan(editedSpan);
+        if (nextSpan) {
+            const sel = document.getSelection();
+            sel.removeAllRanges();
+            // console.log(`sel.anchorOffset:`, sel.anchorOffset);
+            const spanText = getSpanText(nextSpan);
+            // console.log(`selectPreviousSpan:`, nextSpan, spanText);
+            const textNode = nextSpan.childNodes[0];
+            if (textNode) {
+                const anchorOffset = spanText.length;
+                const range = document.createRange();
+                range.setStart(textNode, anchorOffset);
+                range.setEnd(textNode, anchorOffset);
+                sel.addRange(range);
+            }
+        }
+    }
+}
+
+getFirstDiv = function () {
+    let firstDiv = undefined;
+    const divs = editorContent.getElementsByTagName('div');
+    if (divs && divs[0]) {
+        firstDiv = divs[0]
+    }
+    return firstDiv;
+}
+
+getFirstSpan = function (div) {
+    let firstSpan = undefined;
+    if (div) {
+        const spans = div.getElementsByTagName('span');
+        if (spans && spans[0]) {
+            firstSpan = spans[0]
+        }
+    }
+    return firstSpan;
+}
+
+getSpanClassIndex = function (span) {
+    let spanClassIndex = -1;
+    if (span) {
+        const spanClassName = span.className;
+        spanClassIndex = spanClassNameMap[spanClassName];
+    }
+    return spanClassIndex;
+}
+
+getNextSpan = function (currentSpan) {
+    let nextSpan = currentSpan;
+    const parentDiv = getParentDiv(currentSpan);
+    if (parentDiv) {
+        const currentSpanClassIndex = getSpanClassIndex(currentSpan);
+        const spans = parentDiv.getElementsByTagName('span');
+        if (spans && spans[currentSpanClassIndex + 1]) {
+            nextSpan = spans[currentSpanClassIndex + 1]
+        }
+    }
+    return nextSpan;
+}
+
+getPreviousSpan = function (currentSpan) {
+    let nextSpan = currentSpan;
+    const parentDiv = getParentDiv(currentSpan);
+    if (parentDiv) {
+        const currentSpanClassIndex = getSpanClassIndex(currentSpan);
+        const spans = parentDiv.getElementsByTagName('span');
+        if (spans && spans[currentSpanClassIndex - 1]) {
+            nextSpan = spans[currentSpanClassIndex - 1]
+        }
+    }
+    return nextSpan;
+}
+
+getSpanText = function (span, noTrim) {
+    let spanText = '';
+    if (span) {
+        if (noTrim) {
+            spanText = span.textContent;
+        } else {
+            spanText = span.textContent.trim();
+        }
+    }
+    return spanText;
 }
 
 getParentDiv = function (element) {
@@ -295,6 +486,26 @@ getEditedSpan = function () {
     return editedSpan;
 }
 
+createNewDiv = function () {
+
+}
+
+isValidDiv = function (div) {
+    let validDiv = true;
+    const spans = div.getElementsByTagName('span');
+    const numSpans = spans.length;
+    if (numSpans != 4) {
+        validDiv = false;
+    } else {
+        for (let i = 0; i < numSpans; i++) {
+            if (spans[i].className != spanClassNames[i]) {
+                validDiv = false;
+            }
+        }
+    }
+    return validDiv;
+}
+
 btn.addEventListener("click", function () {
     var s = editorContent.innerHTML;
     content.style.display = "block";
@@ -303,7 +514,7 @@ btn.addEventListener("click", function () {
 
 setHtml.addEventListener("click", function () {
     const html = content.value;
-    console.log(html)
+    // console.log(html)
     editorContent.innerHTML = html;
     rewriteContent();
 });
@@ -313,13 +524,13 @@ getText.addEventListener("click", function () {
     getEditorText();
 });
 
-getEditorText = function() {
+getEditorText = function () {
     content.value = getMerlinText();
 }
 
 cssContent.onkeydown = function (evt) {
     evt = evt || window.event;
-    console.log("keydown: " + evt.keyCode);
+    // console.log("keydown: " + evt.keyCode);
     if (evt.keyCode == 9) {
         evt.preventDefault();
         insertText(cssContent, '    ')
@@ -348,24 +559,24 @@ insertText = function (element, text) {
 }
 
 setCss.addEventListener("click", function () {
-    console.log(`setCss:`, styleNode);
+    // console.log(`setCss:`, styleNode);
     styleNode.innerText = cssContent.value;
-    console.log(`setCss:`, styleNode);
+    // console.log(`setCss:`, styleNode);
 });
 
 reset.addEventListener("click", function () {
-    console.log(`reset:`);
+    // console.log(`reset:`);
     resetEditor();
 });
 
-resetEditor = function() {
-//     editorContent.innerHTML = ` OBJ $300 ;DEMO PROGRAM
-//  ORG $300
-//  EQU $F8DD
-// START JSR BELL ;RING THE BELL
-// END RTS
-// `;
-editorContent.innerHTML = ` ORG $0800
+resetEditor = function () {
+    //     editorContent.innerHTML = ` OBJ $300 ;DEMO PROGRAM
+    //  ORG $300
+    //  EQU $F8DD
+    // START JSR BELL ;RING THE BELL
+    // END RTS
+    // `;
+    editorContent.innerHTML = ` ORG $0800
 PATT EQU $FC
 GRAPH EQU $C050
 TEXT EQU $C051
@@ -426,7 +637,7 @@ RETURN RTS
 }
 
 clear.addEventListener("click", function () {
-    console.log(`clear:`);
+    // console.log(`clear:`);
     editorContent.innerHTML = ``;
 });
 

@@ -144,3 +144,11 @@ The PATTERN KEYS program [docs/T.PATT_KEYS](docs/T.PATT_KEYS) uses the value of 
 The output will look like:  
 
 ![PATT_KEYS Output](docs/assembler-8-js-pattern.png)
+
+
+#### Fonts
+- http://www.kreativekorp.com/software/fonts/apple2.shtml
+
+#### License
+
+[MIT](https://github.com/electron/electron/blob/master/LICENSE)

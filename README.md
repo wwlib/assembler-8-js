@@ -4,7 +4,9 @@ A Javascript 6502 assembly text editor inspired by the Merlin 8 Assembler for th
 
 This is an **incomplete** proof of concept demonstrating the use of Javascript and the browser's [contenteditable](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content) attibute to implement a simple in-browser assembly editor.
 
-This POC is a simple editor.
+[Give it a try]()
+
+![assembler-8-js-editor](docs/assembler-8-js-editor.png)
 
 #### Motivation
 - Developing Apple II (6502) assembly code would be easier with a column-oriented editor
@@ -68,61 +70,64 @@ END RTS
 
 - hires byte patterns from keyboard input
 ```
- ORG $0800
-PATT EQU $FC
-GRAPH EQU $C050
-TEXT EQU $C051
-MIXED EQU $C053
-HIRES EQU $C057
-PGONE EQU $C054
+*****************************************
+*           PATTERN KEYS                *
+*****************************************
+ ORG $0800 
+PATT EQU $FC 
+GRAPH EQU $C050 
+TEXT EQU $C051 
+MIXED EQU $C053 
+HIRES EQU $C057 
+PGONE EQU $C054 
 KEYIN EQU $FD1B ; READ THE KEYBOARD
-LSB EQU $FA
-MSB EQU $FB
-CHAR EQU $C000
-CLEAR LDA #$01
- STA PATT
- JSR DRAW
- JMP KEYLOOP
-SET LDA #$FF
- STA PATT
- JSR DRAW
-KEYLOOP LDA CHAR
+LSB EQU $FA 
+MSB EQU $FB 
+CHAR EQU $C000 
+CLEAR LDA #$01 
+ STA PATT 
+ JSR DRAW 
+ JMP KEYLOOP 
+SET LDA #$FF 
+ STA PATT 
+ JSR DRAW 
+KEYLOOP LDA CHAR 
  CMP #$80 ; CHECK FOR CHARACTER
  BCC KEYLOOP ; JUMP TO INCREMENT PATT
- JSR KEYIN
- STA PATT
+ JSR KEYIN 
+ STA PATT 
  CMP #$C3 ; C
- BEQ END
+ BEQ END 
  NOP  ; JSR ROTATE
- LDA $C010
- JSR DRAW
- JMP KEYLOOP
-ROTATE CLC
- ROL PATT
- BNE ROTRET
- LDA #$01
- STA PATT
-ROTRET RTS
-END LDA TEXT
- BRK
-DRAW LDA #$20
- STA MSB
- LDA #$00
- STA LSB
+ LDA $C010 
+ JSR DRAW 
+ JMP KEYLOOP 
+ROTATE CLC 
+ ROL PATT 
+ BNE ROTRET 
+ LDA #$01 
+ STA PATT 
+ROTRET RTS 
+END LDA TEXT 
+ BRK 
+DRAW LDA #$20 
+ STA MSB 
+ LDA #$00 
+ STA LSB 
  LDY #$00 ; TRIGGER SOFT SWITCHES
- LDA GRAPH
- LDA HIRES
- LDA PGONE
-LOOP LDA PATT
- STA (LSB),Y
- INC LSB
- BEQ BUMPMSB
- JMP LOOP
-BUMPMSB INC MSB
- LDA #$40
- CMP MSB
- BEQ RETURN
- JMP LOOP
+ LDA GRAPH 
+ LDA HIRES 
+ LDA PGONE 
+LOOP LDA PATT 
+ STA (LSB),Y 
+ INC LSB 
+ BEQ BUMPMSB 
+ JMP LOOP 
+BUMPMSB INC MSB 
+ LDA #$40 
+ CMP MSB 
+ BEQ RETURN 
+ JMP LOOP 
 RETURN RTS
 
 ```

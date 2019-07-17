@@ -4,6 +4,8 @@ A Javascript 6502 assembly text editor inspired by the Merlin 8 Assembler for th
 
 This is an **incomplete** proof of concept demonstrating the use of Javascript and the browser's [contenteditable](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content) attibute to implement a simple in-browser assembly editor.
 
+[Video  Demo (YouTube)](https://youtu.be/7-aDlfaTPNk)
+
 [Give it a try](https://wwlib.org/assembler-8-js/)
 
 ![assembler-8-js-editor](docs/assembler-8-js-editor.png)

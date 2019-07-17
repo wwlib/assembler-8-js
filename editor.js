@@ -175,7 +175,7 @@ rewriteContent = function () {
         // console.log(`textContent:`, textContent);
         // console.log(`innerHTML:`, innerHTML);
         // console.log(`lines: count:`, lines.length);
-        console.log(`lines:`, JSON.stringify(lines, null, 2));
+        // console.log(`lines:`, JSON.stringify(lines, null, 2));
         let linesHtml = '';
         lines.forEach(line => {
             const firstCharacter = line.substring(0, 1);
@@ -233,13 +233,20 @@ rewriteContent = function () {
         // console.log(`anchorOffset:`, anchorNode);
         let closestSpan = getClosestSpan(anchorNode);
         if (closestSpan) {
-            const editedSpanClassName = closestSpan.className;
+            let editedSpanClassName = closestSpan.className;
             // console.log(`closestSpan:`, closestSpan, editedSpanClassName);
-            const parentDiv = getParentDiv(anchorNode)
+            let parentDiv = getParentDiv(anchorNode)
             const reformatDivData = reformatDiv(parentDiv, editedSpanClassName, anchorOffset);
             // console.log(`reformatDivData:`, reformatDivData);
+            if (reformatDivData.editedSpanClassName == 'asmAsterisk') {
+                editedSpanClassName = 'asmAsterisk';
+                const activeDiv = getActiveDiv();
+                if (activeDiv) {
+                    parentDiv = activeDiv;
+                }
+            }
             result.spaceTab = reformatDivData.spaceTab;
-            if (reformatDivData && reformatDivData.selectionOffset) {
+            if (reformatDivData && reformatDivData.selectionOffset != undefined) {
                 anchorOffset = reformatDivData.selectionOffset
             }
             closestSpan = parentDiv.getElementsByClassName(editedSpanClassName)[0];
@@ -289,12 +296,18 @@ getLineHtmlWithLineTextArray = function (lineTextArray, editedSpanClassName, sel
     // add default spans
     let lineHtml = '';
     let spaceTab = false; // was space typed at the end of a term
-    if (editedSpanClassName == 'asmAsterisk') {
-        if (lineTextArray && lineTextArray.length > 0) {
-            let line = lineTextArray.join(' ');
+    const firstCharacter = lineTextArray[0].trimLeft().substring(0,1);
+    if (firstCharacter == '*') { //editedSpanClassName == 'asmAsterisk') {
+        // if (lineTextArray && lineTextArray.length > 0) {
+            let line = lineTextArray[0];
+            // console.log(`line:`, line);
             line = line.replace(/~/g, ' ');
             lineHtml += `<span class="${spanClassNames[4]}">${line}</span>`;
-        }
+            if (selectionOffset > line.length) {
+                selectionOffset = line.length;
+            }
+            editedSpanClassName = spanClassNames[4]; // asmAsterisk
+        // }
     } else {
         for (let s = 0; s < 4; s++) {
             spans.push(`<span class="${spanClassNames[s]}"> </span>`);
@@ -346,7 +359,7 @@ getLineHtmlWithLineTextArray = function (lineTextArray, editedSpanClassName, sel
         }
         lineHtml += spans.join('');
     }
-    return { lineHtml: lineHtml, selectionOffset: selectionOffset, spaceTab: spaceTab };
+    return { lineHtml: lineHtml, selectionOffset: selectionOffset, spaceTab: spaceTab, editedSpanClassName: editedSpanClassName };
 }
 
 reformatDiv = function (div, editedSpanClassName, anchorOffset) {
@@ -366,7 +379,7 @@ reformatDiv = function (div, editedSpanClassName, anchorOffset) {
     const lineHtmlData = getLineHtmlWithLineTextArray(lineTextArray, editedSpanClassName, anchorOffset);
     // console.log(`reformatDiv: lineHtml:`, lineHtmlData.lineHtml);
     div.innerHTML = lineHtmlData.lineHtml;
-    return { selectionOffset: lineHtmlData.selectionOffset, spaceTab: lineHtmlData.spaceTab }
+    return { selectionOffset: lineHtmlData.selectionOffset, spaceTab: lineHtmlData.spaceTab, editedSpanClassName: lineHtmlData.editedSpanClassName }
 }
 
 selectNextSpan = function () {
@@ -510,6 +523,16 @@ getEditedSpan = function () {
     const anchorNode = sel.anchorNode;
     const editedSpan = getClosestSpan(anchorNode);
     return editedSpan;
+}
+
+getActiveDiv = function() {
+    let result = undefined;
+    const sel = document.getSelection();
+    const anchorNode = sel.anchorNode;
+    if (anchorNode && anchorNode.nodeName === "DIV") {
+        result = anchorNode;
+    }
+    return result;
 }
 
 createNewDiv = function () {

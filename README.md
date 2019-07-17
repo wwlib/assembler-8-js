@@ -2,7 +2,7 @@
 
 A Javascript 6502 assembly text editor inspired by the Merlin 8 Assembler for the Apple II
 
-This is an **incomplete** proof of concept demonstrating the use of Javascript and the browser's [contenteditable](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content) attibute to implement a simple in-browser assembly editor.
+This is an **incomplete** proof of concept demonstrating the use of Javascript and the browser's [contenteditable](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content) attribute to implement a simple in-browser assembly editor.
 
 [Video  Demo (YouTube)](https://youtu.be/7-aDlfaTPNk)
 

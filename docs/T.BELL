@@ -1,7 +1,7 @@
-******************
-* SAMPLE PROGRAM *
-******************
+******************************
+* RING THE BELL   *
+******************************
  ORG $300 
 BELL EQU $FBDD 
 START JSR BELL ;RING THE BELL
-END RTS
+END RTS 

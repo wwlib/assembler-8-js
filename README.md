@@ -1,4 +1,4 @@
-### Assembler 8 JS (Proof of Concept)
+### Assembler 8 JS (ASsembly Editor Proof of Concept, WIP)
 
 A Javascript 6502 assembly text editor inspired by the Merlin 8 Assembler for the Apple II
 
@@ -22,6 +22,10 @@ This is an **incomplete** proof of concept demonstrating the use of Javascript a
   - http://tomaslind.net/2016/02/18/how-to-align-columns-in-notepad/
   - https://www.ultraedit.com/support/tutorials-power-tips/ultraedit/csv-files.html
 
+#### Controls
+- TAB/SHIFT-TAB to move between columns
+  - also SPACE to moce to the next column
+- RETURN/SHIFT-RETURN to add/delete lines
 
 #### Merlin
 - Merlin source code text can be pasted into the Assembler 8 editor
@@ -31,8 +35,10 @@ This is an **incomplete** proof of concept demonstrating the use of Javascript a
 
 #### Status
 - Currenty, a proof of concept of a simple in-browser assembly text editor
+- Usable, but plenty of issues
 
 #### Todo
+- add line numbers option
 - convert to Typescript
 - add better vertical keyboard navigation
 - ...
@@ -47,6 +53,10 @@ This is an **incomplete** proof of concept demonstrating the use of Javascript a
   - https://medium.engineering/why-contenteditable-is-terrible-122d8a40e480
   - https://medium.com/@adrianmcli/a-beginner-s-guide-to-draft-js-d1823f58d8cc
   - https://www.mozzafiller.com/posts/how-does-monaco-editor-enable-text-editing-on-a-web-page
+  - https://codemirror.net/doc/internals.html
+  - https://codemirror.net/6/
+    - https://news.ycombinator.com/item?id=17858672
+    - https://jsfiddle.net/developit/whgL3udy/4/
 - Keyboard events
   - https://javascript.info/keyboard-events
 

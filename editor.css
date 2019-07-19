@@ -6,7 +6,7 @@
 
 input:focus, textarea:focus {
     outline: 2px solid #5A5046;
-    border: 2px solid #5A5046;
+    /* border: 2px solid #5A5046; */
 }
 
 [contenteditable]:focus {
@@ -95,7 +95,7 @@ body {
     margin-bottom: 2px;
 }
 
-.getcontent{
+.getcontent {
     font-family: monospace;
     height: 200px;
     width: 80vw;

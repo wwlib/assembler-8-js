@@ -1,4 +1,4 @@
-### Assembler 8 JS (ASsembly Editor Proof of Concept, WIP)
+### Assembler 8 JS (Assembly Editor Proof of Concept, WIP)
 
 A Javascript 6502 assembly text editor inspired by the Merlin 8 Assembler for the Apple II
 
